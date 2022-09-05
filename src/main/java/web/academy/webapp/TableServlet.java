@@ -30,7 +30,7 @@ public class TableServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
         response.setContentType(CONTENT_TYPE);
 
-        String result = "There is no such file in directory";
+        String result = ""; // make as instance variable?
         final File file = new File(Objects.requireNonNull(TableServlet.class.getClassLoader()
                 .getResource("db")).getPath() + request.getPathInfo());
         StringJoiner joiner = new StringJoiner(", ");
@@ -44,6 +44,13 @@ public class TableServlet extends HttpServlet {
                 throw new RuntimeException(e);
             }
             result = "Data in " + file.getName() + ": " + joiner;
+        } else {
+            try {
+                System.err.println("ERROR 404 from TableServlet class, doGet method: There is no such file in directory!");
+                response.sendError(HttpServletResponse.SC_NOT_FOUND); // test it
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         try (PrintWriter out = response.getWriter()) {
@@ -66,11 +73,16 @@ public class TableServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) {
         response.setContentType(CONTENT_TYPE);
 
-        String result;
+        String result = "";
         final File file = new File(Objects.requireNonNull(TableServlet.class.getClassLoader()
                 .getResource("db")).getPath() + request.getPathInfo());
         if (file.exists()) {
-            result = "Such file is already exist";
+            try {
+                System.err.println("ERROR 409 from TableServlet class, doPost method: Such file is already exist!");
+                response.sendError(HttpServletResponse.SC_CONFLICT); // test it
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         } else {
             try {
                 file.createNewFile();
@@ -144,12 +156,19 @@ public class TableServlet extends HttpServlet {
     public void doDelete(HttpServletRequest request, HttpServletResponse response) {
         response.setContentType(CONTENT_TYPE);
 
-        String result = "There is no such file in directory";
+        String result = "";
         final File file = new File(Objects.requireNonNull(TableServlet.class.getClassLoader()
                 .getResource("db")).getPath() + request.getPathInfo());
         if (file.exists()) {
             result = file.getName() + " is deleted";
             file.delete();
+        } else {
+            try {
+                System.err.println("ERROR 404 from TableServlet class, doDelete method: There is no such file in directory!");
+                response.sendError(HttpServletResponse.SC_NOT_FOUND); // test it
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         try (PrintWriter out = response.getWriter()) {

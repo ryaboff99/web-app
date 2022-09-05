@@ -28,7 +28,7 @@ public class MyFilter implements Filter {
         if(session.getAttribute("login") == null) {
             HttpServletResponse resp = (HttpServletResponse) response;
             resp.sendError(HttpServletResponse.SC_FORBIDDEN);
-            System.err.println("login is absent");
+            System.err.println("ERROR 403 from MyFilter class, doFilter method: Login is absent!");
         } else {
             filterChain.doFilter(request, response);
         }
