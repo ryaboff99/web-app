@@ -1,4 +1,4 @@
-package web.academy.webapp;
+package web.academy.webapp.servlets;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;

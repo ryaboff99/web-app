@@ -6,7 +6,7 @@
 
         <filter>
             <filter-name>MyFilter</filter-name>
-            <filter-class>web.academy.webapp.MyFilter</filter-class>
+            <filter-class>web.academy.webapp.servlets.MyFilter</filter-class>
         </filter>
 
         <filter-mapping>

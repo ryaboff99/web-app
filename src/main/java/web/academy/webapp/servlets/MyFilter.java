@@ -1,4 +1,4 @@
-package web.academy.webapp;
+package web.academy.webapp.servlets;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
