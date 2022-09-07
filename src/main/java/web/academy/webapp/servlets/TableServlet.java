@@ -33,12 +33,8 @@ public class TableServlet extends HttpServlet {
         if (file.exists()) {
             resultPrinter(response, FileRepository.getFileContent(file));
         } else {
-            try {
-                System.err.println("ERROR 404 from TableServlet class, doGet method: There is no such file in directory!");
-                response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            System.err.println("ERROR 404 from TableServlet class, doGet method: There is no such file in directory!");
+            errorSender(response, HttpServletResponse.SC_NOT_FOUND);
         }
     }
 
@@ -48,12 +44,8 @@ public class TableServlet extends HttpServlet {
 
         final File file = new File(PATHNAME + request.getPathInfo());
         if (file.exists()) {
-            try {
-                System.err.println("ERROR 409 from TableServlet class, doPost method: Such file is already exist!");
-                response.sendError(HttpServletResponse.SC_CONFLICT);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            System.err.println("ERROR 409 from TableServlet class, doPost method: Such file is already exist!");
+            errorSender(response, HttpServletResponse.SC_CONFLICT);
         } else {
             resultPrinter(response, FileRepository.createFile(file));
         }
@@ -74,16 +66,12 @@ public class TableServlet extends HttpServlet {
         if (file.exists()) {
             resultPrinter(response, FileRepository.deleteFile(file));
         } else {
-            try {
-                System.err.println("ERROR 404 from TableServlet class, doDelete method: There is no such file in directory!");
-                response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            System.err.println("ERROR 404 from TableServlet class, doDelete method: There is no such file in directory!");
+            errorSender(response, HttpServletResponse.SC_NOT_FOUND);
         }
     }
 
-    private static void resultPrinter(HttpServletResponse response, String result) {
+    private void resultPrinter(HttpServletResponse response, String result) {
         try (PrintWriter out = response.getWriter()) {
             out.println("<html><body>");
             out.println("<h2>" + result + "</h2>");
@@ -95,6 +83,14 @@ public class TableServlet extends HttpServlet {
                     "  \"content\" : \"Alex, John\"" +
                     "} </h3>");
             out.println("</body></html>");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void errorSender(HttpServletResponse response, int error) {
+        try {
+            response.sendError(error);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
