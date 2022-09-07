@@ -4,7 +4,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import web.academy.webapp.ServletProcessor;
+import web.academy.webapp.FileRepository;
 
 import java.io.*;
 import java.util.Objects;
@@ -31,7 +31,7 @@ public class TableServlet extends HttpServlet {
 
         final File file = new File(PATHNAME + request.getPathInfo());
         if (file.exists()) {
-            resultPrinter(response, ServletProcessor.getFileContent(file));
+            resultPrinter(response, FileRepository.getFileContent(file));
         } else {
             try {
                 System.err.println("ERROR 404 from TableServlet class, doGet method: There is no such file in directory!");
@@ -55,7 +55,7 @@ public class TableServlet extends HttpServlet {
                 throw new RuntimeException(e);
             }
         } else {
-            resultPrinter(response, ServletProcessor.createFile(file));
+            resultPrinter(response, FileRepository.createFile(file));
         }
     }
 
@@ -63,7 +63,7 @@ public class TableServlet extends HttpServlet {
     public void doPut(HttpServletRequest request, HttpServletResponse response) {
         response.setContentType(CONTENT_TYPE);
 
-        resultPrinter(response, ServletProcessor.updateFile(request, PATHNAME));
+        resultPrinter(response, FileRepository.updateFile(request, PATHNAME));
     }
 
     @Override
@@ -72,7 +72,7 @@ public class TableServlet extends HttpServlet {
 
         final File file = new File(PATHNAME + request.getPathInfo());
         if (file.exists()) {
-            resultPrinter(response, ServletProcessor.deleteFile(file));
+            resultPrinter(response, FileRepository.deleteFile(file));
         } else {
             try {
                 System.err.println("ERROR 404 from TableServlet class, doDelete method: There is no such file in directory!");

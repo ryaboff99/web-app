@@ -11,9 +11,9 @@ import java.io.IOException;
 import java.util.Scanner;
 import java.util.StringJoiner;
 
-public class ServletProcessor {
+public class FileRepository {
 
-    private ServletProcessor() {
+    private FileRepository() {
         throw new IllegalStateException("Utility class");
     }
 
