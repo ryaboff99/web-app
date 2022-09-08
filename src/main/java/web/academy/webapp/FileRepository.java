@@ -13,11 +13,17 @@ import java.util.StringJoiner;
 
 public class FileRepository {
 
-    private FileRepository() {
-        throw new IllegalStateException("Utility class");
+    private final String pathname;
+
+    public FileRepository(String pathname) {
+        this.pathname = pathname;
     }
 
-    public static String getFileContent(File file) {
+    public String getPathname() {
+        return pathname;
+    }
+
+    public String getFileContent(File file) {
         StringJoiner joiner = new StringJoiner(", ");
 
         try (Scanner output = new Scanner(file)) {
@@ -30,7 +36,7 @@ public class FileRepository {
         return "Data in " + file.getName() + ": " + joiner;
     }
 
-    public static String createFile(File file) {
+    public String createFile(File file) {
         try {
             file.createNewFile();
         } catch (IOException e) {
@@ -39,7 +45,7 @@ public class FileRepository {
         return file.getName() + " file is created";
     }
 
-    public static String updateFile(HttpServletRequest request, String pathname) {
+    public String updateFile(HttpServletRequest request) {
         final JsonObject jsonData;
         try {
             jsonData = new Gson().fromJson(request.getReader(), JsonObject.class);
@@ -64,7 +70,7 @@ public class FileRepository {
         return result;
     }
 
-    public static String deleteFile(File file) {
+    public String deleteFile(File file) {
         String result = file.getName() + " is deleted";
         file.delete();
         return result;
