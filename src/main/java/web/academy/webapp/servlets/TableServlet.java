@@ -1,5 +1,7 @@
 package web.academy.webapp.servlets;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,9 +36,8 @@ public class TableServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
         response.setContentType(CONTENT_TYPE);
 
-        final File file = new File(fileRepository.getPathname() + request.getPathInfo());
-        if (file.exists()) {
-            resultPrinter(response, fileRepository.getFileContent(file));
+        if (fileRepository.fileExist(request.getPathInfo())) {
+            resultPrinter(response, fileRepository.getFileContent(request.getPathInfo()));
         } else {
             System.err.println("ERROR 404 from TableServlet class, doGet method: There is no such file in directory!");
             errorSender(response, HttpServletResponse.SC_NOT_FOUND);
@@ -47,12 +48,11 @@ public class TableServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) {
         response.setContentType(CONTENT_TYPE);
 
-        final File file = new File(fileRepository.getPathname() + request.getPathInfo());
-        if (file.exists()) {
+        if (fileRepository.createFile(request.getPathInfo())) {
+            resultPrinter(response, request.getPathInfo().replace("/","") + " file is created");
+        } else {
             System.err.println("ERROR 409 from TableServlet class, doPost method: Such file is already exist!");
             errorSender(response, HttpServletResponse.SC_CONFLICT);
-        } else {
-            resultPrinter(response, fileRepository.createFile(file));
         }
     }
 
@@ -60,16 +60,34 @@ public class TableServlet extends HttpServlet {
     public void doPut(HttpServletRequest request, HttpServletResponse response) {
         response.setContentType(CONTENT_TYPE);
 
-        resultPrinter(response, fileRepository.updateFile(request));
+        final JsonObject jsonData;
+        if (fileRepository.fileExist(request.getPathInfo())) {
+            try {
+                jsonData = new Gson().fromJson(request.getReader(), JsonObject.class);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            fileRepository.updateFile(jsonData, request.getPathInfo());
+
+            resultPrinter(response, request.getPathInfo().replace("/","") + " is updated");
+        } else {
+            try {
+                jsonData = new Gson().fromJson(request.getReader(), JsonObject.class);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            fileRepository.updateFile(jsonData, request.getPathInfo());
+
+            resultPrinter(response, request.getPathInfo().replace("/","") + " is created");
+        }
     }
 
     @Override
     public void doDelete(HttpServletRequest request, HttpServletResponse response) {
         response.setContentType(CONTENT_TYPE);
 
-        final File file = new File(fileRepository.getPathname() + request.getPathInfo());
-        if (file.exists()) {
-            resultPrinter(response, fileRepository.deleteFile(file));
+        if (fileRepository.deleteFile(request.getPathInfo())) {
+            resultPrinter(response, request.getPathInfo().replace("/","") + " is deleted");
         } else {
             System.err.println("ERROR 404 from TableServlet class, doDelete method: There is no such file in directory!");
             errorSender(response, HttpServletResponse.SC_NOT_FOUND);

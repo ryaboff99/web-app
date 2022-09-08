@@ -1,8 +1,6 @@
 package web.academy.webapp;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import jakarta.servlet.http.HttpServletRequest;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -19,11 +17,13 @@ public class FileRepository {
         this.pathname = pathname;
     }
 
-    public String getPathname() {
-        return pathname;
+    public boolean fileExist(String requestPathInfo) {
+        File file = new File(pathname + requestPathInfo);
+        return file.exists();
     }
 
-    public String getFileContent(File file) {
+    public String getFileContent(String requestPathInfo) {
+        File file = new File(pathname + requestPathInfo);
         StringJoiner joiner = new StringJoiner(", ");
 
         try (Scanner output = new Scanner(file)) {
@@ -36,43 +36,26 @@ public class FileRepository {
         return "Data in " + file.getName() + ": " + joiner;
     }
 
-    public String createFile(File file) {
+    public boolean createFile(String requestPathInfo) {
+        File file = new File(pathname + requestPathInfo);
         try {
-            file.createNewFile();
+            return file.createNewFile();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return file.getName() + " file is created";
     }
 
-    public String updateFile(HttpServletRequest request) {
-        final JsonObject jsonData;
-        try {
-            jsonData = new Gson().fromJson(request.getReader(), JsonObject.class);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        String result;
-        final File file = new File(pathname + request.getPathInfo());
-        if (file.exists()) {
-            result = file.getName() + " is updated";
-        } else {
-            result = file.getName() + " is created";
-        }
-
+    public void updateFile(JsonObject jsonData, String requestPathInfo) {
         String stringData = jsonData.get("content").getAsString();
-        try (FileWriter fileWriter = new FileWriter(file.getPath())) {
+        try (FileWriter fileWriter = new FileWriter(pathname + requestPathInfo)) {
             fileWriter.write(stringData);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return result;
     }
 
-    public String deleteFile(File file) {
-        String result = file.getName() + " is deleted";
-        file.delete();
-        return result;
+    public boolean deleteFile(String requestPathInfo) {
+        File file = new File(pathname + requestPathInfo);
+        return file.delete();
     }
 }
