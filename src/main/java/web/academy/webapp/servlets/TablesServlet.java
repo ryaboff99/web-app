@@ -4,6 +4,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import web.academy.webapp.FileRepository;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,14 +24,20 @@ import java.util.StringJoiner;
 @WebServlet(name = "tablesServlet", value = "/tables")
 public class TablesServlet extends HttpServlet {
 
+    private FileRepository fileRepository;
+    @Override
+    public void init() {
+        fileRepository = new FileRepository(Objects.requireNonNull(
+                TableServlet.class.getClassLoader().getResource("db")).getPath());
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         response.setContentType("text/html");
 
         final StringJoiner joiner = new StringJoiner(", ");
-        final File files = new File(Objects.requireNonNull(TableServlet.class.getClassLoader()
-                .getResource("db")).getPath());
+        final File files = new File(fileRepository.getPathname());
         for (File file : Objects.requireNonNull(files.listFiles())) {
             joiner.add(file.getName());
         }
